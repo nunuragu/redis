@@ -1,0 +1,60 @@
+1.1 aeMain 간략 설명
+![image](https://github.com/nunuragu/redis/assets/114291400/d9029f4a-6ac9-496c-95af-daa03bba21f5)
+
+1.1 aeMain 상세 설명
+![image](https://github.com/nunuragu/redis/assets/114291400/ce0bcbf8-909e-4aa3-93e1-a221e495bfc4)
+![image](https://github.com/nunuragu/redis/assets/114291400/b5a789ef-d650-4aa7-8d02-f4e04c7e24ac)
+![image](https://github.com/nunuragu/redis/assets/114291400/3d19ad97-cece-413d-bbe9-76296a7e62c3)
+![image](https://github.com/nunuragu/redis/assets/114291400/c56a8803-b156-46f3-b66d-52db7064b296)
+
+1.2 call graph
+![image](https://github.com/nunuragu/redis/assets/114291400/9111e897-d839-461f-953f-33518f909858)
+1.2 사용되는 자료 구조 및 형식
+- 버퍼(Buffer)
+Redis 프로토콜 형식으로 직렬화된 명령이 네트워크 소켓을 통해 전송됩니다.
+서버는 이 명령을 수신하고, 버퍼를 파싱하여 명령을 이해하고 처리합니다.
+
+- Redis In-Memory 데이터 구조
+Redis는 여러 가지 자료 구조를 사용합니다. SET 명령의 경우, 데이터는 키-값 구조로 In-Memory DB에 저장됩니다.
+이 데이터는 해시 맵, 스키마 무의 키-값 저장소 등으로 저장될 수 있습니다.
+
+1.2 처리과정 설명
+1. 명령 생성
+사용자가 SET x 1을 입력하면, Redis 클라이언트 라이브러리가 이를 SET 명령으로 변환하고, Redis 프로토콜 형식에 맞게 직렬화합니다.
+
+2. 네트워크 전송
+직렬화된 명령은 네트워크 소켓을 통해 서버로 전송됩니다.
+
+3. 서버 수신 및 처리
+서버는 전송된 명령을 수신하고 버퍼에서 파싱하여 SET 명령을 이해합니다.
+SET 명령에 따라, 값을 In-Memory 데이터베이스에 저장합니다.
+
+4. In-Memory 데이터베이스 저장
+SET 명령에 따라, 'x'라는 키에 값 '1'을 In-Memory 데이터베이스에 저장합니다.
+
+1.2 처리과정 그림 설명
+![image](https://github.com/nunuragu/redis/assets/114291400/82018879-311c-410c-bdb9-7fe9487cf140)
+
+
+1.3
+![image](https://github.com/nunuragu/redis/assets/114291400/43a9cadb-7abd-443b-b966-87cce7bfa813)
+
+redis-7.2.3/src/commands 에서 pang.json을 생성
+![image](https://github.com/nunuragu/redis/assets/114291400/5726ffbe-dcf7-4fb1-be4b-434769e68ac6)
+
+commands.def에서 pang  매크로 생성
+![image](https://github.com/nunuragu/redis/assets/114291400/ae39251f-9467-4a6c-b37a-521f2bde064c)
+
+server.c에서는 
+shared.pang = createStringObject("pang",4);
+ 생성 후
+![image](https://github.com/nunuragu/redis/assets/114291400/2a26417e-3509-4eef-b39b-4e553dc86937)
+와 pang command를 생성한다
+![image](https://github.com/nunuragu/redis/assets/114291400/a3e7c523-d2d2-49c7-81f5-8ba875deca6b)
+또한 check if c-> cmd 부분에서
+![image](https://github.com/nunuragu/redis/assets/114291400/37876626-ddd1-48e1-91ee-f1321263e368)
+프로그램 실행 중에 해당 명령의 존재 여부를 확인하는데 사용할 수 있는 형식 지정자를 사용하는 문자열을 추가하고 연결된 데이터 구조에서 변수나 멤버를 참조한다.
+
+그 후 server.h에서 위에 작성했던 sharedObjectsStrct 구조체에 *pung과 *pang 을 삽입 후
+commands prototypes에 추가
+![image](https://github.com/nunuragu/redis/assets/114291400/9bd8322c-eef1-4836-957f-2fe2013e5e6f) 
